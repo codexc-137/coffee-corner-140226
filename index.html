@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Coffee Corner Valentine</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="scene" aria-live="polite">
+      <div class="glow"></div>
+      <header class="intro">
+        <p class="overline">coffee corner request</p>
+        <h1>Will you be my valentine?</h1>
+        <p class="subtitle">(I know I'm a litte late and sorry for that but it's my first time vibe-coding) Either way please choose the mode of brewing you'd like: (Use your hands, pinch to select, see the magic)</p>
+      </header>
+
+      <section class="counter" role="group" aria-label="Valentine options">
+        <article class="option yes" data-choice="yes">
+          <div class="label">Espresso Machine</div>
+          <div class="frame">
+            <img src="./i.delonghi.png" alt="Espresso machine" />
+            <div class="steam"></div>
+          </div>
+          <button class="cta">Duh! Yes, of course!</button>
+        </article>
+
+        <article class="option no" data-choice="no">
+          <div class="label">Moka Pot</div>
+          <div class="frame">
+            <img src="./i.mokapot.png" alt="Moka pot" />
+            <div class="steam"></div>
+          </div>
+          <button class="cta alt">Nah, not this year, sorry</button>
+        </article>
+      </section>
+
+      <div class="receipt" aria-hidden="true">
+        <div class="paper">
+          <div class="stamp">Order Up</div>
+          <h2>One Valentine</h2>
+          <p>Prepared with extra foam and a quiet grin.</p>
+          <div class="sig">— koka boy</div>
+          <button class="reset">Brew again</button>
+        </div>
+      </div>
+
+      <div class="note" role="status" aria-live="polite"></div>
+    </main>
+
+    <div class="hand-cursor" aria-hidden="true"></div>
+    <div class="tracker" aria-hidden="true">
+      <video class="input-video" autoplay playsinline></video>
+      <canvas class="output-canvas"></canvas>
+      <div class="tracker-label">Hand Tracking</div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+    <script src="./script.js"></script>
+  </body>
+</html>
