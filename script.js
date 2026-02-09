@@ -7,6 +7,7 @@ const tracker = document.querySelector('.tracker');
 const videoElement = document.querySelector('.input-video');
 const canvasElement = document.querySelector('.output-canvas');
 const canvasCtx = canvasElement.getContext('2d');
+const handToggle = document.querySelector('#handToggle');
 
 const notes = [
   'The moka pot is taking a nap.',
@@ -20,6 +21,10 @@ let lastPinch = false;
 let pinchLatch = false;
 let smoothX = window.innerWidth / 2;
 let smoothY = window.innerHeight / 2;
+let hands = null;
+let camera = null;
+let handEnabled = false;
+let isStarting = false;
 
 function showNote(message, duration = 2000) {
   note.textContent = message;
@@ -112,21 +117,22 @@ function drawHandLandmarks(results) {
 }
 
 async function initHands() {
-  if (!navigator.mediaDevices?.getUserMedia) return;
+  if (!navigator.mediaDevices?.getUserMedia) return null;
 
-  const hands = new Hands({
+  const instance = new Hands({
     locateFile: (file) =>
       `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
   });
 
-  hands.setOptions({
+  instance.setOptions({
     maxNumHands: 1,
     modelComplexity: 1,
     minDetectionConfidence: 0.7,
     minTrackingConfidence: 0.7,
   });
 
-  hands.onResults((results) => {
+  instance.onResults((results) => {
+    if (!handEnabled) return;
     if (!results.multiHandLandmarks?.length) {
       drawHandLandmarks(results);
       return;
@@ -154,7 +160,18 @@ async function initHands() {
     drawHandLandmarks(results);
   });
 
-  const camera = new Camera(videoElement, {
+  return instance;
+}
+
+async function startHandTracking() {
+  if (handEnabled || isStarting) return;
+  isStarting = true;
+  hands = hands || (await initHands());
+  if (!hands) {
+    isStarting = false;
+    return;
+  }
+  camera = camera || new Camera(videoElement, {
     onFrame: async () => {
       await hands.send({ image: videoElement });
     },
@@ -162,8 +179,28 @@ async function initHands() {
     height: 360,
   });
 
+  handEnabled = true;
   tracker.setAttribute('aria-hidden', 'false');
+  cursor.classList.add('active');
   await camera.start();
+  isStarting = false;
 }
 
-initHands();
+function stopHandTracking() {
+  handEnabled = false;
+  cursor.classList.remove('active', 'pinch');
+  setHover(null);
+  lastPinch = false;
+  pinchLatch = false;
+  tracker.setAttribute('aria-hidden', 'true');
+  if (camera?.stop) camera.stop();
+  camera = null;
+}
+
+handToggle.addEventListener('change', () => {
+  if (handToggle.checked) {
+    startHandTracking();
+  } else {
+    stopHandTracking();
+  }
+});
